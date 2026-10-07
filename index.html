@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UKID | Web Design & Development</title>
+  
+  <!-- PWA - APP CONVERSION -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ff7200">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="UKID">
+  <meta name="application-name" content="UKID">
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1006/1006771.png">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1006/1006771.png">
+  
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW failed:', err));
+  });
+}
+</script>
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">Ukid<span>.</span></div>
+    <nav><a href="index.html">Home</a><a href="about.html">About</a><a href="services.html">Service</a><a href="contact.html">Contact</a><a href="privacy.html">Privacy</a></nav>
+    <div class="search-box"><input type="text" placeholder="Search..."><button><i class="fas fa-search"></i></button></div>
+  </header>
+  
+  <!-- INSTALL BANNER - Shows only when installable -->
+  <div id="install-banner" style="display:none; background:#ff7200; color:#fff; padding:10px 20px; text-align:center; font-size:12px; font-weight:600;">
+    <i class="fas fa-mobile-alt"></i> Install UKID App for better experience 
+    <button id="installBtn" style="margin-left:12px; background:#fff; color:#ff7200; border:none; padding:6px 12px; border-radius:6px; font-weight:700; cursor:pointer;">Install</button>
+    <span onclick="this.parentElement.style.display='none'" style="float:right; cursor:pointer; margin-left:12px;">×</span>
+  </div>
+
+  <section class="hero">
+    <div class="hero-text">
+      <h1>Web Design &<br><span>Development</span><br>Course</h1>
+      <p>Learn to build modern websites. Join 50k+ students.</p>
+      <div id="welcome-box"></div>
+      <!-- APP BADGE -->
+      <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+        <span style="background:#101010; border:1px solid #222; padding:6px 10px; border-radius:20px; font-size:10px;"><i class="fas fa-check-circle" style="color:#00ff88"></i> Offline Ready</span>
+        <span style="background:#101010; border:1px solid #222; padding:6px 10px; border-radius:20px; font-size:10px;"><i class="fas fa-mobile-alt" style="color:#ff7200"></i> Installable App</span>
+      </div>
+    </div>
+    <div class="login-card">
+      <div class="card-header"><h2 id="form-title">Login Here</h2><p id="form-subtitle">Welcome back!</p></div>
+      <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="email" placeholder="Email Address"></div>
+      <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="password" placeholder="Password"></div>
+      <div class="forgot-row"><a href="#" id="forgot-btn">Forgot Password?</a></div>
+      <div id="toast"></div>
+      <button class="btn-login" id="login-btn">Login</button>
+      <button class="btn-login outline" id="signup-btn" style="display:none">Create Account</button>
+      <button class="btn-login danger" id="logout-btn" style="display:none;">Logout</button>
+      <div class="divider"><span>Or continue with</span></div>
+      <div class="social-login">
+        <button id="google-login" class="social-btn google"><i class="fab fa-google"></i> Google</button>
+        <button id="facebook-login" class="social-btn fb"><i class="fab fa-facebook-f"></i></button>
+        <button id="twitter-login" class="social-btn tw"><i class="fab fa-twitter"></i></button>
+      </div>
+      <p class="switch-text">Don't have an account? <a href="#" id="toggle-auth">Sign up</a></p>
+    </div>
+  </section>
+
+  <script type="module" src="script.js"></script>
+  
+  <!-- PWA INSTALL LOGIC -->
+  <script>
+    // Service Worker
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('sw.js').then(()=>console.log('UKID App Ready'));
+    }
+    
+    // Install Prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('install-banner').style.display = 'block';
+    });
+    
+    document.getElementById('installBtn')?.addEventListener('click', async () => {
+      if(!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      if(choice.outcome === 'accepted'){
+        document.getElementById('install-banner').style.display = 'none';
+      }
+      deferredPrompt = null;
+    });
+    
+    // Hide banner if already installed
+    window.addEventListener('appinstalled', () => {
+      document.getElementById('install-banner').style.display = 'none';
+    });
+  </script>
+</body>
+</html>
